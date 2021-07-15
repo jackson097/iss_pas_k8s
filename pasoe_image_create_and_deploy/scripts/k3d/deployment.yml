@@ -1,0 +1,124 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: iss-pas
+  labels:
+    app: iss-pas
+    version: v1
+spec:
+  selector:
+    matchLabels:
+      app: iss-pas
+      version: v1
+
+  template:
+    metadata:
+      labels:
+        app: iss-pas
+        version: v1
+    spec:
+      volumes:
+        - name: deploy-artifacts-dir
+          emptyDir: {}
+        - name: java-dir
+          emptyDir: {}
+        - name: license-dir
+          secret:
+            secretName: progress-122-license
+        - name: runtime-config-iss-pas
+          configMap:
+            name: runtime-config-iss-pas
+        - name: logging-config-iss-pas
+          configMap:
+            name: logging-config-iss-pas
+      initContainers:
+        - image: "k3d-registry:5000/iss-pas"
+          name: war
+          imagePullPolicy: IfNotPresent
+          command: ["/bin/sh", "-c", "cp -r /deploy-staging/artifacts/* /deploy/artifacts"]
+          volumeMounts:
+            - mountPath: /deploy/artifacts
+              name: deploy-artifacts-dir
+
+        - image: "adoptopenjdk:11.0.4_11-jdk-hotspot"
+          name: copy-java
+          imagePullPolicy: IfNotPresent
+          command: ["/bin/sh", "-c", "cp -r /opt/java/openjdk/* /java"]
+          volumeMounts:
+            - name: java-dir
+              mountPath: /java
+      containers:
+        - name: iss-pas-container
+          image: "k3d-registry:5000/pasoe:12.2.3"
+          imagePullPolicy: IfNotPresent
+          command: ["/bin/sh", "-c", "cp /cfg/progress.cfg /psc/dlc/progress.cfg && sh /deploy/scripts/startServer.sh"]
+          volumeMounts:
+              - name: deploy-artifacts-dir
+                mountPath: /deploy/artifacts
+              - name: java-dir
+                mountPath: /usr/java
+              - name: license-dir
+                readOnly: false
+                mountPath: /cfg
+              - name: runtime-config-iss-pas
+                mountPath: /deploy/scripts/config
+              - name: logging-config-iss-pas
+                mountPath: /fluentbit-tlr
+          env:
+          - name: FLUENTBIT_LOGGING
+            value: "false"
+          - name: INSTANCE_NAME
+            value: iss-pas
+          - name: APP_NAME
+            value: iss-pas
+          ports:
+            - name: https
+              containerPort: 8811
+              protocol: TCP
+        - name: issdb-container
+          image: "k3d-registry:5000/issdb:latest"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 7979
+              name: brokerport
+              protocol: TCP
+            - containerPort: 7980
+              name: db1
+              protocol: TCP
+            - containerPort: 7981
+              name: db2
+              protocol: TCP
+            - containerPort: 7982
+              name: db3
+              protocol: TCP
+            - containerPort: 7983
+              name: db4
+              protocol: TCP
+            - containerPort: 7984
+              name: db5
+              protocol: TCP
+            - containerPort: 7985
+              name: db6
+              protocol: TCP
+            - containerPort: 7986
+              name: db7
+              protocol: TCP
+            - containerPort: 7987
+              name: db8
+              protocol: TCP
+            - containerPort: 7988
+              name: db9
+              protocol: TCP
+            - containerPort: 7989
+              name: db10
+              protocol: TCP
+            - containerPort: 7990
+              name: db11
+              protocol: TCP
+          env:
+            - name: DB_BROKER_PORT
+              value: "7979"
+            - name: DB_MINPORT
+              value: "7980"
+            - name: DB_MAXPORT
+              value: "7990"

@@ -1,0 +1,25 @@
+ADD TABLE "coords"
+  AREA "Schema Area"
+  DUMP-NAME "coords"
+
+ADD FIELD "latitude" OF "coords" AS decimal 
+  FORMAT "->>9.9999"
+  INITIAL "0"
+  POSITION 2
+  MAX-WIDTH 19
+  DECIMALS 4
+  ORDER 10
+
+ADD FIELD "longitude" OF "coords" AS decimal 
+  FORMAT "->>9.9999"
+  INITIAL "0"
+  POSITION 3
+  MAX-WIDTH 19
+  DECIMALS 4
+  ORDER 20
+
+.
+PSC
+cpstream=ISO8859-1
+.
+0000000352

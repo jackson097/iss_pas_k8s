@@ -1,0 +1,40 @@
+version: "3.6"
+services:
+    jdk:
+        image: adoptopenjdk:11.0.4_11-jdk-hotspot
+        volumes:
+          - jdk_dc:/opt/java/openjdk
+    ablapp:
+        image: iss-pas:latest
+        volumes:
+          - app_dc:/deploy-staging/artifacts
+    pasoeinstance:
+        image: harbor.stratinfotech.com/library/progresssoftware/pasoe:12.2.3
+        depends_on: 
+          - jdk
+          - ablapp
+        environment:
+          - FLUENTBIT_LOGGING=false
+          - APP_NAME=iss-pas
+          - INSTANCE_NAME=iss_pas
+        ports:
+          - "8811:8811"
+        container_name: "iss_pas_pasoeinstance_dc"
+        command: ["/bin/sh", "-c", "sh /deploy/scripts/startServer.sh"]
+        volumes:
+          - type: volume
+            source: jdk_dc
+            target: /usr/java
+            volume:
+              nocopy: true
+          - type: volume
+            source: app_dc
+            target: /deploy/artifacts
+            volume:
+              nocopy: true
+          - C:\docker_images\pasoe-image\PROGRESS_PASOE_CONTAINER_IMAGE_12.2.5_LNX_64\deploy\license\progress.cfg:/psc/dlc/progress.cfg
+          - C:\docker_images\pasoe-image\PROGRESS_PASOE_CONTAINER_IMAGE_12.2.5_LNX_64\deploy\conf\runtime.properties:/deploy/scripts/config/runtime.properties
+          - C:\docker_images\pasoe-image\PROGRESS_PASOE_CONTAINER_IMAGE_12.2.5_LNX_64\deploy\conf\logging:/fluentbit-tlr
+volumes:
+    jdk_dc:
+    app_dc:
