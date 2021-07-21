@@ -5,11 +5,8 @@ This project is used to create an OpenEdge Database image (OEDB) and a deploymen
 # K3D Local Registry
 K3D cannot pull images from your local docker registry. In this project, it assumes that a k3d registry has been created, linked to your cluster, and that the iss-pas and issdb images have been pushed to the local registry
 
-
-# How to Deploy To K3D
-Inside the pasoe_image_create_and_deploy directory, run 'proant deploy'
-
-
+# How to Deploy Project to K3D
+In the project directory, run 'helm install iss-pas iss-charts/ --values iss-charts/values.yaml'. This will create the Deployment, Service, Secret, and ConfigMap from the iss-charts/template files.
 
 
 # Create OEDB Image
@@ -41,7 +38,3 @@ The pasoe_image_create_and_deploy/license directory contains the progress licens
 
 ### Scripts
 The pasoe_image_create_and_deploy/scripts/k3d directory contains the deployment definition template and service definition template that are used with the config.properties file to create proper deployment and service definitions required to deploy the project to k3d with the OEDB and PASOE images. The build.xml file is an ant file called by ../build.xml as long as DEPLOYMENT.MODE in config.properties is k3d
-
-
-# How to Run
-In the project directory, run 'helm install iss-pas iss-charts/ --values iss-charts/values.yaml'. This will create the Deployment, Service, Secret, and ConfigMap from the iss-charts/template files.
