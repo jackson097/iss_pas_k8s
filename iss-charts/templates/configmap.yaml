@@ -1,0 +1,7 @@
+# Source: mychart/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.configMap.name }}
+data:
+   runtime.properties: {{ .Values.configMap.runtimeProperties }}

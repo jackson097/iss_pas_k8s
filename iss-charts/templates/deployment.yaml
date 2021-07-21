@@ -1,0 +1,83 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.projectName }}
+  labels:
+{{ toYaml .Values.labels | indent 4 }}
+spec:
+  selector:
+    matchLabels:
+{{ toYaml .Values.labels | indent 6 }}
+  template:
+    metadata:
+      labels:
+{{ toYaml .Values.labels | indent 8 }}
+    spec:
+      volumes:
+{{ toYaml .Values.volumes | indent 8 }}
+      initContainers:
+        - image: {{ .Values.issPasImage.repository }}
+          name: {{ .Values.issPasImage.name }}
+          imagePullPolicy: {{ .Values.issPasImage.pullPolicy }}
+          command: {{ .Values.issPasImage.command }}
+          {{- with .Values.issPasImage.args }}
+          args: [{{ include "quoted.array" . }}]
+          {{- end }}
+          volumeMounts:
+            {{- range $volumeMount := .Values.issPasImage.volumeMounts }}
+              - name: {{ $volumeMount.name }}
+                mountPath: {{ $volumeMount.mountPath }}
+            {{- end }}
+
+        - image: {{ .Values.jdkImage.repository }}
+          name: {{ .Values.jdkImage.name }}
+          imagePullPolicy: {{ .Values.jdkImage.pullPolicy }}
+          command: {{ .Values.jdkImage.command }}
+          {{- with .Values.jdkImage.args }}
+          args: [{{ include "quoted.array" . }}]
+          {{- end }}
+          volumeMounts:
+            {{- range $volumeMount := .Values.jdkImage.volumeMounts }}
+              - name: {{ $volumeMount.name }}
+                mountPath: {{ $volumeMount.mountPath }}
+            {{- end }}
+
+      containers:
+        - image: {{ .Values.pasoeImage.repository }}
+          name: {{ .Values.pasoeImage.name }}
+          imagePullPolicy: {{ .Values.pasoeImage.pullPolicy }}
+          command: {{ .Values.pasoeImage.command }}
+          {{- with .Values.pasoeImage.args }}
+          args: [{{ include "quoted.array" . }}]
+          {{- end }}
+          volumeMounts:
+            {{- range $volumeMount := .Values.pasoeImage.volumeMounts }}
+              - name: {{ $volumeMount.name }}
+                mountPath: {{ $volumeMount.mountPath }}
+            {{- end }}
+          env:
+            {{- range $env := .Values.pasoeImage.env }}
+              - name: {{ $env.name | quote }}
+                value: {{ $env.value | quote }}
+            {{- end }}
+          ports:
+            {{- range $port := .Values.pasoeImage.ports }}
+              - containerPort: {{ $port.containerPort }}
+                name: {{ $port.name }}
+                protocol: {{ $port.protocol }}
+            {{- end }}
+            
+        - image: {{ .Values.issdbImage.repository }}
+          name: {{ .Values.issdbImage.name }}
+          imagePullPolicy: {{ .Values.issdbImage.pullPolicy }}
+          ports:
+            {{- range $port := .Values.issdbImage.ports }}
+            - containerPort: {{ $port.containerPort }}
+              name: {{ $port.name }}
+              protocol: {{ $port.protocol }}
+            {{- end }}
+          env:
+            {{- range $env := .Values.issdbImage.env }}
+              - name: {{ $env.name | quote }}
+                value: {{ $env.value | quote }}
+            {{- end }}

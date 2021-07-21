@@ -1,0 +1,202 @@
+# Default values for iss-charts.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+projectName: iss-pas
+
+volumes:
+  - name: deploy-artifacts-dir
+    emptyDir: {}
+  - name: java-dir
+    emptyDir: {}
+  - name: license-dir
+    secret:
+      secretName: progress-122-license
+  - name: runtime-config-iss-pas
+    configMap:
+      name: runtime-config-iss-pas
+
+labels:
+  app: iss-pas
+  version: v1
+
+issPasImage:
+  repository: "k3d-registry:5000/iss-pas"
+  name: war
+  pullPolicy: IfNotPresent
+  command: ["/bin/sh"]
+  args: ["-c", "cp -r /deploy-staging/artifacts/* /deploy/artifacts"]
+  volumeMounts:
+    - mountPath: /deploy/artifacts
+      name: deploy-artifacts-dir
+
+jdkImage:
+  repository: "adoptopenjdk:11.0.4_11-jdk-hotspot"
+  name: copy-java
+  pullPolicy: IfNotPresent
+  command: ["/bin/sh"]
+  args: ["-c", "cp -r /opt/java/openjdk/* /java"]
+  volumeMounts:
+    - name: java-dir
+      mountPath: /java
+
+pasoeImage: 
+  repository: "k3d-registry:5000/pasoe:12.2.3"
+  name: iss-pas-container
+  pullPolicy: IfNotPresent
+  command: ["/bin/sh"]
+  args: ["-c", "cp /cfg/progress.cfg /psc/dlc/progress.cfg && sh /deploy/scripts/startServer.sh"]
+  volumeMounts:
+    - name: deploy-artifacts-dir
+      mountPath: /deploy/artifacts
+    - name: java-dir
+      mountPath: /usr/java
+    - name: license-dir
+      mountPath: /cfg
+    - name: runtime-config-iss-pas
+      mountPath: /deploy/scripts/config
+  env:
+    - name: "INSTANCE_NAME"
+      value: "iss-pas"
+    - name: "APP_NAME"
+      value: "iss-pas"
+  ports:
+    - containerPort: 8811
+      name: https
+      protocol: TCP
+
+issdbImage:
+  repository: "k3d-registry:5000/issdb:latest"
+  name: issdb-container
+  pullPolicy: IfNotPresent
+  ports:
+    - containerPort: 7979
+      name: brokerport
+      protocol: TCP
+    - containerPort: 7980
+      name: db1
+      protocol: TCP
+    - containerPort: 7981
+      name: db2
+      protocol: TCP
+    - containerPort: 7982
+      name: db3
+      protocol: TCP
+    - containerPort: 7983
+      name: db4
+      protocol: TCP
+    - containerPort: 7984
+      name: db5
+      protocol: TCP
+    - containerPort: 7985
+      name: db6
+      protocol: TCP
+    - containerPort: 7986
+      name: db7
+      protocol: TCP
+    - containerPort: 7987
+      name: db8
+      protocol: TCP
+    - containerPort: 7988
+      name: db9
+      protocol: TCP
+    - containerPort: 7989
+      name: db10
+      protocol: TCP
+    - containerPort: 7990
+      name: db11
+      protocol: TCP
+  env:
+    - name: "DB_BROKER_PORT"
+      value: "7979"
+    - name: "DB_MINPORT"
+      value: "7980"
+    - name: "DB_MAXPORT"
+      value: "7990"
+
+configMap:
+  name: runtime-config-iss-pas
+  runtimeProperties: iss_pas.DB.CONNECTION.PARAMS=-db issdb -H localhost -S 7979
+
+secret:
+  name: progress-122-license
+  type: Opaque
+  data:
+    progressLicense: BFBvcnRmb2xpbyBQbHVzIEluYy4AAAAAAAAAAAAAAAAA/wCADA2wgLD/ADEyLjIgICAgICAgICAgICAwMDYxNDkyMDAgICAgIDJUMllBMUNXU09SU0hEM0xFVUFJSjIzWjVYVEw1MTU0UFNKQVVVRUtXUFNOWFFUSE5QAP+AAAANAACA/w0NDQBZOUJSU1hQNlhDNDRHPzSAAA0A/w2AgAAA/w1Qcm9ncmVzcyBQcm9kQVMgZm9yIE9FAAAAAAAAAAAAAAAAAFR1ZSBNYXkgMTkgMTk6MzI6MDQgMjAyMAoA/wCADA2wgLD/ADEyLjIgICAgICAgICAgICAwMDQxMTQ5NzIgICAgIDFTVFlBWU9TVFBSWUZYWUxBWUJJQjI0SjZYVEpXMlk0T1RKQVVVRkNYSFNGSFJTUEVQAP+AAAANAACA/w0NDQBaUEI4U1RQUFRNTjRSWTiAAA0A/w2AgAAA/w1PRSBFbnRlcnByaXNlIFJEQk1TAAAAAAAAAAAAAAAAAAAAAFR1ZSBNYXkgMTkgMTk6MzI6MDQgMjAyMAoA/wCADA2wgLD/ADEyLjIgICAgICAgICAgICAwMDQxMTQ5NzYgICAgIDJRS1pBWVNXVFBSMUZYM0xFRUFJQjIzWjZYVERXMjUySFJKQVVVRUtYSFNKSFJYUE1IAP+AAAANAACA/w0NDQBZWkZSU1hRUDJONTRDP02AAA0A/w2AgAAA/w00R0wgRGV2ZWxvcG1lbnQgU3lzdGVtAAAAAAAAAAAAAAAAAFR1ZSBNYXkgMTkgMTk6MzI6MDQgMjAyMAoA/wCADA2wgLD/ADEyLjIgICAgICAgICAgICAwMDYxNDkyMDAgICAgIDJSMllBU0tXVEtSU0hIVUxFRUFJSjE0WjZXVEw1MTU0UFFKQVVRRktYTlNOWFFUSE5IAP+AAAANAACA/w0NDQBaWkRSUzZQODJDTk1DWTSAAA0A/w2AgAAA/w1PRSBBdXRoIEdhdGV3YXkAAAAAAAAAAAAAAAAAAAAAAAAAAFR1ZSBNYXkgMTkgMTk6MzI6MDQgMjAyMAo=
+
+service:
+  type: NodePort
+  name: iss-pas-service
+  port: 8811
+  nodePort: 30123
+  targetPort: https
+  app: iss-pas
+  version: v1
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+ingress:
+  enabled: false
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: chart-example.local
+      paths:
+      - path: /
+        backend:
+          serviceName: chart-example.local
+          servicePort: 80
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
