@@ -69,50 +69,16 @@ issdbImage:
   repository: "k3d-registry:5000/issdb:latest"
   name: issdb-container
   pullPolicy: IfNotPresent
-  ports:
-    - containerPort: 7979
-      name: brokerport
-      protocol: TCP
-    - containerPort: 7980
-      name: db1
-      protocol: TCP
-    - containerPort: 7981
-      name: db2
-      protocol: TCP
-    - containerPort: 7982
-      name: db3
-      protocol: TCP
-    - containerPort: 7983
-      name: db4
-      protocol: TCP
-    - containerPort: 7984
-      name: db5
-      protocol: TCP
-    - containerPort: 7985
-      name: db6
-      protocol: TCP
-    - containerPort: 7986
-      name: db7
-      protocol: TCP
-    - containerPort: 7987
-      name: db8
-      protocol: TCP
-    - containerPort: 7988
-      name: db9
-      protocol: TCP
-    - containerPort: 7989
-      name: db10
-      protocol: TCP
-    - containerPort: 7990
-      name: db11
-      protocol: TCP
+  portInfo:
+    numberOfPorts: 12
+    startingPort: 7979
   env:
     - name: "DB_BROKER_PORT"
-      value: "7979"
+      value: 7979
     - name: "DB_MINPORT"
-      value: "7980"
+      value: 7980
     - name: "DB_MAXPORT"
-      value: "7990"
+      value: 7990
 
 configMap:
   name: runtime-config-iss-pas

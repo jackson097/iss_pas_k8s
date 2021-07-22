@@ -28,7 +28,6 @@ spec:
               - name: {{ $volumeMount.name }}
                 mountPath: {{ $volumeMount.mountPath }}
             {{- end }}
-
         - image: {{ .Values.jdkImage.repository }}
           name: {{ .Values.jdkImage.name }}
           imagePullPolicy: {{ .Values.jdkImage.pullPolicy }}
@@ -41,7 +40,6 @@ spec:
               - name: {{ $volumeMount.name }}
                 mountPath: {{ $volumeMount.mountPath }}
             {{- end }}
-
       containers:
         - image: {{ .Values.pasoeImage.repository }}
           name: {{ .Values.pasoeImage.name }}
@@ -66,15 +64,17 @@ spec:
                 name: {{ $port.name }}
                 protocol: {{ $port.protocol }}
             {{- end }}
-            
         - image: {{ .Values.issdbImage.repository }}
           name: {{ .Values.issdbImage.name }}
           imagePullPolicy: {{ .Values.issdbImage.pullPolicy }}
           ports:
-            {{- range $port := .Values.issdbImage.ports }}
-            - containerPort: {{ $port.containerPort }}
-              name: {{ $port.name }}
-              protocol: {{ $port.protocol }}
+            {{- $dbPorts := (.Values.issdbImage.portInfo.numberOfPorts | int) }}
+            {{- $startingPort := (.Values.issdbImage.portInfo.startingPort | int) }}
+
+            {{- range $i := until $dbPorts }}
+                - containerPort: {{ add $startingPort $i }}
+                  name: db{{ $i }}
+                  protocol: TCP
             {{- end }}
           env:
             {{- range $env := .Values.issdbImage.env }}
