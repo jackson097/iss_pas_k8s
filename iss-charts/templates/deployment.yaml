@@ -75,14 +75,7 @@ spec:
           name: {{ .Values.issdbImage.name }}
           imagePullPolicy: {{ .Values.issdbImage.pullPolicy }}
           ports:
-            {{- $dbPorts := (.Values.issdbImage.portInfo.numberOfPorts | int) }}
-            {{- $startingPort := (.Values.issdbImage.portInfo.startingPort | int) }}
-
-            {{- range $i := until $dbPorts }}
-                - containerPort: {{ add $startingPort $i }}
-                  name: db{{ $i }}
-                  protocol: TCP
-            {{- end }}
+{{ include "ports.list" . | indent 10 }}
           env:
             {{- range $env := .Values.issdbImage.env }}
               - name: {{ $env.name | quote }}

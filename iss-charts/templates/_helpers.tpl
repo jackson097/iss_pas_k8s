@@ -68,3 +68,17 @@ Join a list of strings into a quoted array
 {{- $local := dict "first" true -}}
 {{- range . -}}{{- if not $local.first -}},{{- end -}}{{- . | quote -}}{{- $_ := set $local "first" false -}}{{- end -}}
 {{- end -}}
+
+{{/*
+Return multiple port definitions for deployment given the starting port and number of ports in a row from the values file
+*/}}
+{{- define "ports.list" -}}
+{{- $dbPorts := (.Values.issdbImage.portInfo.numberOfPorts | int) }}
+{{- $startingPort := (.Values.issdbImage.portInfo.startingPort | int) }}
+
+{{- range $i := until $dbPorts }}
+    - containerPort: {{ add $startingPort $i }}
+      name: db{{ $i }}
+      protocol: TCP
+{{- end }}
+{{- end}}
