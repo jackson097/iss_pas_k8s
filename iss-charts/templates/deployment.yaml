@@ -16,6 +16,7 @@ spec:
       volumes:
 {{ toYaml .Values.volumes | indent 8 }}
       initContainers:
+        # iss-pas Image
         - image: {{ .Values.issPasImage.repository }}
           name: {{ .Values.issPasImage.name }}
           imagePullPolicy: {{ .Values.issPasImage.pullPolicy }}
@@ -28,6 +29,8 @@ spec:
               - name: {{ $volumeMount.name }}
                 mountPath: {{ $volumeMount.mountPath }}
             {{- end }}
+        
+        # JDK Image
         - image: {{ .Values.jdkImage.repository }}
           name: {{ .Values.jdkImage.name }}
           imagePullPolicy: {{ .Values.jdkImage.pullPolicy }}
@@ -40,7 +43,9 @@ spec:
               - name: {{ $volumeMount.name }}
                 mountPath: {{ $volumeMount.mountPath }}
             {{- end }}
+
       containers:
+        # PASOE Image
         - image: {{ .Values.pasoeImage.repository }}
           name: {{ .Values.pasoeImage.name }}
           imagePullPolicy: {{ .Values.pasoeImage.pullPolicy }}
@@ -64,6 +69,8 @@ spec:
                 name: {{ $port.name }}
                 protocol: {{ $port.protocol }}
             {{- end }}
+
+        # DB Image
         - image: {{ .Values.issdbImage.repository }}
           name: {{ .Values.issdbImage.name }}
           imagePullPolicy: {{ .Values.issdbImage.pullPolicy }}
