@@ -70,7 +70,7 @@ Join a list of strings into a quoted array
 {{- end -}}
 
 {{/*
-Return multiple port definitions for deployment given the starting port and number of ports in a row from the values file
+Return multiple port definitions for deployment given the MINPORT and MAXPORT defined in values file
 */}}
 {{- define "ports.list" -}}
 {{- $brokerPort := (.Values.issdbImage.env.brokerPort.value | int) }}

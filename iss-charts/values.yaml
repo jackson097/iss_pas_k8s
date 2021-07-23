@@ -72,13 +72,13 @@ issdbImage:
   portInfo:
     protocol: TCP
   env:
-    brokerPort:
+    brokerport:
       name: "DB_BROKER_PORT"
       value: 7979
-    minPort:
+    minport:
       name: "DB_MINPORT"
       value: 7980
-    maxPort:
+    maxport:
       name: "DB_MAXPORT"
       value: 7990
 
