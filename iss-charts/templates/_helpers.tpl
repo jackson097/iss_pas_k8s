@@ -77,7 +77,7 @@ Return multiple port definitions for deployment given the starting port and numb
 {{- $minPort := (.Values.issdbImage.env.minPort.value | int) }}
 {{- $maxPort := (.Values.issdbImage.env.maxPort.value | int) }}
 {{- $protocol := .Values.issdbImage.portInfo.protocol }}
-{{- $portRange := (sub $maxPort $minPort) | int }}
+{{- $portRange := (add (sub $maxPort $minPort) 1) | int }}
 
     - containerPort: {{ $brokerPort }}
       name: broker-port
