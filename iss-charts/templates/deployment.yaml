@@ -77,7 +77,9 @@ spec:
           ports:
 {{ include "ports.list" . | indent 10 }}
           env:
-            {{- range $env := .Values.issdbImage.env }}
-              - name: {{ $env.name | quote }}
-                value: {{ $env.value | quote }}
-            {{- end }}
+            - name: {{ .Values.issdbImage.env.brokerPort.name | quote }}
+              value: {{ .Values.issdbImage.env.brokerPort.value | quote }}
+            - name: {{ .Values.issdbImage.env.minPort.name | quote }}
+              value: {{ .Values.issdbImage.env.minPort.value | quote }}
+            - name: {{ .Values.issdbImage.env.maxPort.name | quote }}
+              value: {{ .Values.issdbImage.env.maxPort.value | quote }}

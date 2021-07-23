@@ -73,12 +73,19 @@ Join a list of strings into a quoted array
 Return multiple port definitions for deployment given the starting port and number of ports in a row from the values file
 */}}
 {{- define "ports.list" -}}
-{{- $dbPorts := (.Values.issdbImage.portInfo.numberOfPorts | int) }}
-{{- $startingPort := (.Values.issdbImage.portInfo.startingPort | int) }}
+{{- $brokerPort := (.Values.issdbImage.env.brokerPort.value | int) }}
+{{- $minPort := (.Values.issdbImage.env.minPort.value | int) }}
+{{- $maxPort := (.Values.issdbImage.env.maxPort.value | int) }}
+{{- $protocol := .Values.issdbImage.portInfo.protocol }}
+{{- $portRange := (sub $maxPort $minPort) | int }}
 
-{{- range $i := until $dbPorts }}
-    - containerPort: {{ add $startingPort $i }}
+    - containerPort: {{ $brokerPort }}
+      name: broker-port
+      protocol: {{ $protocol }}
+
+{{- range $i := until $portRange }}
+    - containerPort: {{ add $minPort $i }}
       name: db{{ $i }}
-      protocol: TCP
+      protocol: {{ $protocol }}
 {{- end }}
 {{- end}}

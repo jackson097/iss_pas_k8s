@@ -70,14 +70,16 @@ issdbImage:
   name: issdb-container
   pullPolicy: IfNotPresent
   portInfo:
-    numberOfPorts: 12
-    startingPort: 7979
+    protocol: TCP
   env:
-    - name: "DB_BROKER_PORT"
+    brokerPort:
+      name: "DB_BROKER_PORT"
       value: 7979
-    - name: "DB_MINPORT"
+    minPort:
+      name: "DB_MINPORT"
       value: 7980
-    - name: "DB_MAXPORT"
+    maxPort:
+      name: "DB_MAXPORT"
       value: 7990
 
 configMap:
