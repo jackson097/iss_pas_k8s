@@ -69,7 +69,7 @@ issdbImage:
   repository: "k3d-registry:5000/issdb:latest"
   name: issdb-container
   pullPolicy: IfNotPresent
-  portInfo:
+  ports:
     protocol: TCP
   env:
     brokerport:

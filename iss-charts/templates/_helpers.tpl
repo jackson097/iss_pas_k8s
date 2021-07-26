@@ -73,10 +73,10 @@ Join a list of strings into a quoted array
 Return multiple port definitions for deployment given the MINPORT and MAXPORT defined in values file
 */}}
 {{- define "ports.list" -}}
-{{- $brokerPort := (.Values.issdbImage.env.brokerPort.value | int) }}
-{{- $minPort := (.Values.issdbImage.env.minPort.value | int) }}
-{{- $maxPort := (.Values.issdbImage.env.maxPort.value | int) }}
-{{- $protocol := .Values.issdbImage.portInfo.protocol }}
+{{- $brokerPort := (.Values.issdbImage.env.brokerport.value | int) }}
+{{- $minPort := (.Values.issdbImage.env.minport.value | int) }}
+{{- $maxPort := (.Values.issdbImage.env.maxport.value | int) }}
+{{- $protocol := .Values.issdbImage.ports.protocol }}
 {{- $portRange := (add (sub $maxPort $minPort) 1) | int }}
 
     - containerPort: {{ $brokerPort }}
