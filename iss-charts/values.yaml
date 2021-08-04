@@ -42,7 +42,7 @@ jdkImage:
 
 pasoeImage: 
   repository: "k3d-registry:5000/pasoe:12.2.3"
-  name: iss-pas-container
+  name: iss-pas
   pullPolicy: IfNotPresent
   command: ["/bin/sh"]
   args: ["-c", "cp /cfg/progress.cfg /psc/dlc/progress.cfg && sh /deploy/scripts/startServer.sh"]
@@ -56,10 +56,10 @@ pasoeImage:
     - name: runtime-config-iss-pas
       mountPath: /deploy/scripts/config
   env:
-    - name: "INSTANCE_NAME"
-      value: "iss-pas"
-    - name: "APP_NAME"
-      value: "iss-pas"
+    - name: INSTANCE_NAME
+      value: iss-pas
+    - name: APP_NAME
+      value: iss-pas
   ports:
     - containerPort: 8811
       name: https
@@ -67,20 +67,17 @@ pasoeImage:
 
 issdbImage:
   repository: "k3d-registry:5000/issdb:latest"
-  name: issdb-container
+  name: issdb
   pullPolicy: IfNotPresent
   ports:
     protocol: TCP
   env:
-    brokerport:
-      name: "DB_BROKER_PORT"
-      value: 7979
-    minport:
-      name: "DB_MINPORT"
-      value: 7980
-    maxport:
-      name: "DB_MAXPORT"
-      value: 7990
+    - name: DB_BROKER_PORT
+      value: "7979"
+    - name: DB_MINPORT
+      value: "7980"
+    - name: DB_MAXPORT
+      value: "7990"
 
 configMap:
   name: runtime-config-iss-pas

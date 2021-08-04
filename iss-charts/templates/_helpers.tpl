@@ -70,22 +70,38 @@ Join a list of strings into a quoted array
 {{- end -}}
 
 {{/*
-Return multiple port definitions for deployment given the MINPORT and MAXPORT defined in values file
+Converts a list of objects (e.g. from env) of the form
+
+- name: namevalue
+  value: actualvalue
+
+to a ports listing suitable for container def.
 */}}
-{{- define "ports.list" -}}
-{{- $brokerPort := (.Values.issdbImage.env.brokerport.value | int) }}
-{{- $minPort := (.Values.issdbImage.env.minport.value | int) }}
-{{- $maxPort := (.Values.issdbImage.env.maxport.value | int) }}
-{{- $protocol := .Values.issdbImage.ports.protocol }}
-{{- $portRange := (add (sub $maxPort $minPort) 1) | int }}
-
-    - containerPort: {{ $brokerPort }}
-      name: broker-port
-      protocol: {{ $protocol }}
-
+{{- define "ports.from.env" -}}
+{{- $brokerPort := (include "value.by.name" (dict "values" .values "searchterm" "DB_BROKER_PORT") | int) -}}
+{{- $minPort := (include "value.by.name" (dict "values" .values "searchterm" "DB_MINPORT") | int) -}}
+{{- $maxPort := (include "value.by.name" (dict "values" .values "searchterm" "DB_MAXPORT") | int) -}}
+{{- $dbName := .name -}}
+{{- $protocol := .protocol -}}
+{{- $portRange := (add (sub $maxPort $minPort) 1) | int -}}
+- containerPort: {{ $brokerPort }}
+  name: {{ $dbName }}
+  protocol: {{ $protocol }}
 {{- range $i := until $portRange }}
-    - containerPort: {{ add $minPort $i }}
-      name: db{{ $i }}
-      protocol: {{ $protocol }}
+- containerPort: {{ add $minPort $i }}
+  name: {{ $dbName }}{{ $i }}
+  protocol: {{ $protocol }}
 {{- end }}
-{{- end}}
+{{- end -}}
+
+{{/* 
+Retrieves the value of an environment variable key
+*/}}
+{{- define "value.by.name" -}}
+{{- $key := .searchterm -}}
+{{- range .values }}
+{{- if eq $key .name }}
+{{- .value -}}
+{{- end -}}
+{{- end }}
+{{- end -}}

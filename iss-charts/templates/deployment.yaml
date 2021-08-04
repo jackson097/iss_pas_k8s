@@ -59,25 +59,15 @@ spec:
                 mountPath: {{ $volumeMount.mountPath }}
             {{- end }}
           env:
-            {{- range $env := .Values.pasoeImage.env }}
-              - name: {{ $env.name | quote }}
-                value: {{ $env.value | quote }}
-            {{- end }}
+{{ toYaml .Values.pasoeImage.env | indent 12 }}
           ports:
-            {{- range $port := .Values.pasoeImage.ports }}
-              - containerPort: {{ $port.containerPort }}
-                name: {{ $port.name }}
-                protocol: {{ $port.protocol }}
-            {{- end }}
+{{ toYaml .Values.pasoeImage.ports | indent 12 }}
 
         # DB Image
         - image: {{ .Values.issdbImage.repository }}
           name: {{ .Values.issdbImage.name }}
           imagePullPolicy: {{ .Values.issdbImage.pullPolicy }}
-          ports:
-{{ include "ports.list" . | indent 10 }}
           env:
-            {{- range $env := .Values.issdbImage.env }}
-              - name: {{ $env.name | quote }}
-                value: {{ $env.value | quote }}
-            {{- end }}
+{{ toYaml .Values.issdbImage.env | indent 12 }}
+          ports:
+{{ include "ports.from.env" (dict "values" .Values.issdbImage.env "name" .Values.issdbImage.name "protocol" .Values.issdbImage.ports.protocol) | indent 12 }}

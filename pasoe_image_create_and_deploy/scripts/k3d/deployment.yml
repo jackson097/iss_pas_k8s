@@ -48,7 +48,7 @@ spec:
             - name: java-dir
               mountPath: /java
       containers:
-        - name: iss-pas-container
+        - name: iss-pas
           image: "k3d-registry:5000/pasoe:12.2.3"
           imagePullPolicy: IfNotPresent
           command: ["/bin/sh", "-c", "cp /cfg/progress.cfg /psc/dlc/progress.cfg && sh /deploy/scripts/startServer.sh"]
@@ -75,7 +75,7 @@ spec:
             - name: https
               containerPort: 8811
               protocol: TCP
-        - name: issdb-container
+        - name: issdb
           image: "k3d-registry:5000/issdb:latest"
           imagePullPolicy: IfNotPresent
           ports:
