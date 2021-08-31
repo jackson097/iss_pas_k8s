@@ -4,6 +4,8 @@
 
 projectName: iss-pas
 
+namespace: iss-tracker
+
 volumes:
   - name: deploy-artifacts-dir
     emptyDir: {}
@@ -21,7 +23,7 @@ labels:
   version: v1
 
 issPasImage:
-  repository: "k3d-registry:5000/iss-pas"
+  repository: "artifactory.portfolioplus.net/docker-virtual/iss-tracker/iss-pas:latest"
   name: war
   pullPolicy: IfNotPresent
   command: ["/bin/sh"]
@@ -31,7 +33,7 @@ issPasImage:
       name: deploy-artifacts-dir
 
 jdkImage:
-  repository: "adoptopenjdk:11.0.4_11-jdk-hotspot"
+  repository: "artifactory.portfolioplus.net/docker-virtual/iss-tracker/adoptopenjdk:11.0.4_11-jdk-hotspot"
   name: copy-java
   pullPolicy: IfNotPresent
   command: ["/bin/sh"]
@@ -41,7 +43,7 @@ jdkImage:
       mountPath: /java
 
 pasoeImage: 
-  repository: "k3d-registry:5000/pasoe:12.2.3"
+  repository: "artifactory.portfolioplus.net/docker-virtual/iss-tracker/pasoe:12.2.3"
   name: iss-pas
   pullPolicy: IfNotPresent
   command: ["/bin/sh"]
@@ -66,7 +68,7 @@ pasoeImage:
       protocol: TCP
 
 issdbImage:
-  repository: "k3d-registry:5000/issdb:latest"
+  repository: "artifactory.portfolioplus.net/docker-virtual/iss-tracker/iss-db:latest"
   name: issdb
   pullPolicy: IfNotPresent
   ports:
